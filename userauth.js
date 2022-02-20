@@ -2,7 +2,8 @@ import express from "express"
 const router = express.Router()
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import {getUserByEmail, genPassword, createUser, editRecruiterBio} from  "./helper.js"
+import {getUserByEmail, genPassword, createUser, editRecruiterBio, updateUserProfile, getUserById, getUserInfo} from  "./helper.js"
+import { auth } from "./customauth.js"
 
 router.route("/signup")
 .post(async(request, response)=>{
@@ -64,6 +65,30 @@ router.route("/editRecruiterBio")
     console.log(request.body)
     const {recruiterId, recruiterBio} = request.body
     const result = await editRecruiterBio(recruiterId, recruiterBio)
+    response.send(result)
+})
+
+router.route("/editUserProfile")
+.put(auth, async (request, response)=>{
+    console.log(request.body)
+    const userId = request.user.id
+    const userFromDB = await getUserById(userId)
+    const resume = userFromDB.info.resume
+    const result = await updateUserProfile({...request.body, resume}, userId)
+    response.send(result)
+})
+
+router.route("/getUserInfo")
+.get(auth, async(request, response)=>{
+    const userId = request.user.id
+    const result = await getUserInfo(userId)
+    response.send(result)
+})
+
+router.route("/getUserInfoById/:id")
+.get(auth, async(request, response)=>{
+    const {id} = request.params
+    const result = await getUserById(id)
     response.send(result)
 })
 

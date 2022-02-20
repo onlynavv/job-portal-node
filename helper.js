@@ -30,6 +30,10 @@ async function getJobDetailsById(id){
     return await client.db("job").collection("joblistings").findOne({"_id":ObjectId(id)})
 }
 
+async function updateUserProfile(data, userId){
+    return await client.db("job").collection("users").updateOne({_id:ObjectId(userId)}, {$set:{info:data}},{upsert:true})
+}
+
 async function uploadResumePdf(filePath,id){
     return await client.db("job").collection("users").updateOne({_id:ObjectId(id)}, {$set:{"info.resume":filePath}},{upsert:true})
 }
@@ -86,6 +90,14 @@ async function setRejectionForCandidate(applicationId, candidateId, applicationS
     return await client.db("job").collection("users").updateOne({_id:ObjectId(candidateId), "appliedJobs.applicationId":applicationId},{$set:{"appliedJobs.$.applicationStatus":applicationStatus}})
 }
 
+async function getUserInfo(userId){
+    return await client.db("job").collection("users").findOne({_id:ObjectId(userId)},{projection:{"info":1}})
+}
+
+async function getUserById(userId){
+    return await client.db("job").collection("users").findOne({_id:ObjectId(userId)})
+}
+
 async function getUserByEmail(email){
     return await client.db("job").collection("users").findOne({email:email})
 }
@@ -103,4 +115,4 @@ async function createUser(data) {
     return await client.db("job").collection("users").insertOne(data);
 }
 
-export {getUserByEmail, genPassword, createUser, createSkill, getSkills, addJobListing, getUserJobListings, searchJobsByTitle, getJobDetailsById, editRecruiterBio, uploadResumePdf, applyForJob, addJobToApplied, getUsersApplicationsArr, removeApplication, removeApplicationFromUser, getOngoingCampaigns, getCompletedCampaigns, setToCompleteCampaign, getApplicantsByJobId, changeCandidateStatus, updateUserStatus, removeCandidateFromApplicants, setRejectionForCandidate}
+export {getUserByEmail, genPassword, createUser, createSkill, getSkills, addJobListing, getUserJobListings, searchJobsByTitle, getJobDetailsById, editRecruiterBio, uploadResumePdf, applyForJob, addJobToApplied, getUsersApplicationsArr, removeApplication, removeApplicationFromUser, getOngoingCampaigns, getCompletedCampaigns, setToCompleteCampaign, getApplicantsByJobId, changeCandidateStatus, updateUserStatus, removeCandidateFromApplicants, setRejectionForCandidate, updateUserProfile, getUserById, getUserInfo}
